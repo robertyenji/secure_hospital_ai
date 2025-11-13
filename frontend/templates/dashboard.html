@@ -1,0 +1,334 @@
+<!-- frontend/templates/frontend/dashboard.html -->
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Secure Hospital – AI Chatbot</title>
+  <script src="https://unpkg.com/htmx.org@1.9.10"></script>
+  <meta name="csrf-token" content="{{ csrf_token }}">
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; margin:0; }
+    .wrap { display:flex; min-height:100vh; }
+    .side { width:340px; background:#0f172a; color:white; padding:20px; overflow-y:auto; max-height:100vh; }
+    .side h2 { margin-top:0; }
+    .main { flex:1; display:flex; flex-direction:column; background:#f8fafc; }
+    .chat-container { flex:1; display:flex; flex-direction:column; padding:20px; }
+    .messages { flex:1; overflow-y:auto; margin-bottom:16px; border:1px solid #e5e7eb; border-radius:8px; padding:12px; background:white; }
+    .message { margin:12px 0; padding:12px; border-radius:10px; max-width:85%; word-wrap:break-word; }
+    .message.user { background:#2563eb; color:white; margin-left:auto; }
+    .message.assistant { background:#f0f9ff; border:1px solid #0ea5e9; }
+    .message.system { background:#fef3c7; border-left:4px solid #f59e0b; }
+    .input-row { display:flex; gap:8px; margin-top:12px; }
+    .input-row input { flex:1; padding:12px; border:1px solid #cbd5e1; border-radius:8px; font-size:14px; }
+    .input-row button { padding:12px 16px; }
+    .card { background:white; border:1px solid #e5e7eb; border-radius:12px; padding:16px; margin-bottom:16px; }
+    .btn { display:inline-block; padding:8px 12px; border-radius:10px; border:none; background:#2563eb; color:white; cursor:pointer; font-size:14px; font-weight:500; }
+    .btn.secondary { background:#64748b; }
+    .btn.btn-sm { padding:6px 10px; font-size:12px; }
+    .btn:hover { opacity:0.9; }
+    .row { display:flex; gap:8px; align-items:center; margin:8px 0; }
+    input, select, textarea { border:1px solid #cbd5e1; border-radius:8px; padding:8px; font-size:14px; font-family:inherit; }
+    pre { white-space:pre-wrap; word-break:break-word; margin:0; font-size:12px; }
+    .muted { color:#94a3b8; font-size: 12px; }
+    label { font-weight:600; font-size: 12px; color:#334155; }
+    .sessions-list { max-height:250px; overflow-y:auto; margin:8px 0; }
+    .session-item { padding:8px 10px; background:#1e293b; border-radius:6px; margin:4px 0; cursor:pointer; font-size:13px; transition:background 0.2s; }
+    .session-item:hover { background:#334155; }
+    .session-item.active { background:#2563eb; }
+    .loading { color:#94a3b8; font-size:12px; }
+    .token-count { font-size:11px; color:#94a3b8; margin-top:4px; }
+    h3 { margin:0 0 12px 0; color:#1e293b; }
+  </style>
+</head>
+<body>
+<div class="wrap">
+  <aside class="side">
+    <h2>🏥 Hospital AI</h2>
+    <p class="muted">Chat with LLM Agent</p>
+
+    <!-- Auto-mint the JWT on page load -->
+    <div hx-get="{% url 'frontend:mint_token' %}" hx-trigger="load" hx-swap="none"></div>
+
+    <!-- "Who am I" + RBAC summary -->
+    <div class="card">
+      <div class="row">
+        <button class="btn secondary btn-sm"
+                hx-get="{% url 'frontend:whoami' %}"
+                hx-target="#whoami"
+                hx-swap="innerHTML">Who am I?</button>
+      </div>
+      <div id="whoami" class="muted"></div>
+
+      <div class="row" style="margin-top:12px">
+        <button class="btn secondary btn-sm"
+                hx-get="{% url 'frontend:effective_rbac' %}"
+                hx-target="#rbac"
+                hx-swap="innerHTML">My RBAC</button>
+      </div>
+      <div id="rbac" class="muted"></div>
+    </div>
+
+    <!-- Chat Sessions -->
+    <div class="card">
+      <h3>Conversations</h3>
+      <button class="btn btn-sm" id="newSessionBtn">+ New Chat</button>
+      <div id="sessionsList" class="sessions-list"></div>
+    </div>
+
+    <!-- Quick Tools (MCP calls) -->
+    <div class="card">
+      <h3>Quick Tools</h3>
+      <form id="formOverview"
+            hx-post="{% url 'frontend:mcp_proxy' %}"
+            hx-target="#results"
+            hx-swap="innerHTML">
+        {% csrf_token %}
+        <div class="row">
+          <label style="color:#0ea5e9">Patient ID</label>
+          <input name="patient_id" placeholder="PAT-001" value="PAT-001" />
+        </div>
+        <div class="row">
+          <label style="color:#0ea5e9">Tool</label>
+          <select name="tool">
+            <option value="get_patient_overview">Patient Overview</option>
+            <option value="get_patient_admissions">Admissions</option>
+            <option value="get_patient_appointments">Appointments</option>
+            <option value="get_patient_records">Medical Records</option>
+            <option value="get_my_shifts">My Shifts</option>
+          </select>
+        </div>
+        <button class="btn btn-sm" type="submit">Run</button>
+      </form>
+    </div>
+
+    <!-- Audit log -->
+    <div class="card">
+      <h3>My Latest Audit</h3>
+      <button class="btn secondary btn-sm"
+              hx-get="{% url 'frontend:audit_latest' %}"
+              hx-target="#audit"
+              hx-swap="innerHTML">Refresh</button>
+      <div id="audit" class="muted"></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="chat-container">
+      <div id="messages" class="messages"></div>
+      <div class="input-row">
+        <input id="messageInput" 
+               type="text" 
+               placeholder="Ask anything... (Describe patient symptoms, request medical records, etc.)"
+               />
+        <button class="btn" id="sendBtn">Send</button>
+      </div>
+      <div id="chatStatus" class="muted" style="text-align:center;"></div>
+    </div>
+  </main>
+</div>
+
+<script>
+  let currentSessionId = null;
+
+  // Build fetch headers with JWT authentication
+  function getHeaders(includeContentType = true) {
+    const headers = {
+      'X-CSRFToken': document.querySelector('meta[name="csrf-token"]').content,
+    };
+    if (includeContentType) {
+      headers['Content-Type'] = 'application/json';
+    }
+    
+    // Add Authorization header with JWT token
+    const token = localStorage.getItem('jwt_token');
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    } else {
+      console.warn('⚠️ No JWT token found. Did token minting fail?');
+    }
+    return headers;
+  }
+
+  // Mint token on page load
+  window.addEventListener('load', function() {
+    // Call mint-token endpoint to create JWT
+    fetch('/mint-token/', { method: 'GET' })
+      .then(r => {
+        if (!r.ok) throw new Error(`Failed to mint token: HTTP ${r.status}`);
+        return r.json();
+      })
+      .then(data => {
+        if (data.token) {
+          // Store JWT token in localStorage for all future requests
+          localStorage.setItem('jwt_token', data.token);
+          console.log(`✅ Token minted for ${data.username} (role: ${data.user_role})`);
+        }
+        // Load sessions after token is ready
+        loadSessions();
+      })
+      .catch(err => {
+        console.error('❌ Token minting failed:', err);
+        alert('Failed to authenticate. Please refresh the page and try again.');
+      });
+  });
+
+  // Create new session
+  document.getElementById('newSessionBtn').addEventListener('click', function() {
+    const title = prompt('Chat title (optional):', 'New Chat');
+    if (!title) return;
+    
+    fetch('/api/chat/session/', {
+      method: 'POST',
+      headers: getHeaders(true),
+      body: JSON.stringify({ title, context: {} })
+    })
+    .then(r => {
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.json();
+    })
+    .then(session => {
+      currentSessionId = session.id;
+      document.getElementById('messages').innerHTML = '';
+      document.getElementById('chatStatus').innerHTML = '';
+      loadSessions();
+      showMessage('system', `💬 Chat "${session.title}" created. Ready to chat!`);
+    })
+    .catch(err => showMessage('system', `❌ Error: ${err.message}`));
+  });
+
+  // Load sessions list
+  function loadSessions() {
+    fetch('/api/chat/sessions/?limit=10', {
+      headers: getHeaders(false),
+    })
+    .then(r => {
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.json();
+    })
+    .then(data => {
+      const html = data.sessions.map(s => {
+        const date = new Date(s.updated_at).toLocaleDateString();
+        return `<div class="session-item ${s.id === currentSessionId ? 'active' : ''}" onclick="selectSession(${s.id})">${s.title} <br><span class="muted">${date}</span></div>`;
+      }).join('');
+      document.getElementById('sessionsList').innerHTML = html || '<div class="muted">No conversations yet</div>';
+    })
+    .catch(err => console.error('Load sessions error:', err));
+  }
+
+  // Select a session
+  window.selectSession = function(sessionId) {
+    currentSessionId = sessionId;
+    document.getElementById('messages').innerHTML = '';
+    loadHistory();
+    loadSessions();
+  };
+
+  // Load history
+  function loadHistory() {
+    if (!currentSessionId) return;
+    
+    fetch(`/api/chat/history/?session_id=${currentSessionId}`, {
+      headers: getHeaders(false),
+    })
+    .then(r => {
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.json();
+    })
+    .then(data => {
+      document.getElementById('messages').innerHTML = '';
+      data.messages.forEach(msg => {
+        showMessage(msg.role, msg.content, msg.tokens_used);
+      });
+    })
+    .catch(err => console.error('Load history error:', err));
+  }
+
+  // Show message
+  function showMessage(role, content, tokens = null) {
+    const msgDiv = document.createElement('div');
+    msgDiv.className = `message ${role}`;
+    msgDiv.innerHTML = content.replace(/\n/g, '<br>');
+    if (tokens) msgDiv.innerHTML += `<div class="token-count">${tokens} tokens</div>`;
+    document.getElementById('messages').appendChild(msgDiv);
+    document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+  }
+
+  // Send message
+  document.getElementById('sendBtn').addEventListener('click', sendMessage);
+  document.getElementById('messageInput').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+
+  function sendMessage() {
+    const input = document.getElementById('messageInput');
+    const message = input.value.trim();
+    
+    if (!message) {
+      alert('Please enter a message');
+      return;
+    }
+    
+    if (!currentSessionId) {
+      alert('Please create a new chat first by clicking "+ New Chat"');
+      return;
+    }
+    
+    input.value = '';
+    showMessage('user', message);
+    document.getElementById('chatStatus').innerHTML = '<span class="loading">⏳ Waiting for response...</span>';
+    
+    fetch('/api/chat/message/', {
+      method: 'POST',
+      headers: getHeaders(true),
+      body: JSON.stringify({
+        session_id: currentSessionId,
+        message: message,
+        stream: false
+      })
+    })
+    .then(r => {
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      return r.json();
+    })
+    .then(data => {
+      if (data.error) {
+        showMessage('system', `⚠️ Error: ${data.error}`);
+      } else {
+        showMessage('assistant', data.content, data.tokens_used);
+      }
+      document.getElementById('chatStatus').innerHTML = '';
+    })
+    .catch(err => {
+      showMessage('system', `❌ Error: ${err.message}`);
+      document.getElementById('chatStatus').innerHTML = '';
+    });
+  }
+
+  // Load sessions on page load
+  loadSessions();
+
+  // Attach CSRF token to all HTMX requests
+  document.body.addEventListener('htmx:configRequest', function (evt) {
+    evt.detail.headers['X-CSRFToken'] = document.querySelector('meta[name="csrf-token"]').content;
+  });
+
+  // Pretty print JSON in results
+  function safePretty(targetSelector, xhr) {
+    try {
+      const el = document.querySelector(targetSelector);
+      const data = typeof xhr.response === "string" ? JSON.parse(xhr.response) : xhr.response;
+      if (el) el.innerHTML = "<pre>" + JSON.stringify(data, null, 2) + "</pre>";
+    } catch (e) { /* not JSON; ignore */ }
+  }
+
+  document.body.addEventListener('htmx:afterOnLoad', function(evt) {
+    const target = evt.detail.elt.getAttribute('hx-target');
+    if (target) { safePretty(target, evt.detail.xhr); }
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="text-center py-10">
+  <h2 class="text-3xl font-bold text-blue-700">AI + Compliance in Action</h2>
+  <p class="text-gray-600 mt-2">Test how the MCP redacts sensitive data before AI access.</p>
+  <div class="mt-8">
+    <a href="{% url 'mcp_demo' %}" class="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700">
+      Open MCP Redaction Demo
+    </a>
+  </div>
+</div>
+{% endblock %}

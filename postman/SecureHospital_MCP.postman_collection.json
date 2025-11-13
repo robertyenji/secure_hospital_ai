@@ -1,0 +1,93 @@
+{
+  "info": {
+    "name": "Secure Hospital MCP - Local",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Collection to test MCP server directly and via Django proxy."
+  },
+  "item": [
+    {
+      "name": "Direct MCP • get_medical_records",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "function base64url(source) {",
+              "  let enc = CryptoJS.enc.Base64.stringify(source)",
+              "    .replace(/=+$/,'').replace(/\\+/g,'-').replace(/\\//g,'_');",
+              "  return enc;",
+              "}",
+              "const header = { alg: 'HS256', typ: 'JWT' };",
+              "const payload = {",
+              "  user_id: pm.environment.get('user_id') || '1',",
+              "  role: pm.environment.get('role') || 'Admin',",
+              "  username: pm.environment.get('username') || 'admin'",
+              "};",
+              "const secret = pm.environment.get('JWT_SECRET');",
+              "if (!secret) {",
+              "  console.warn('JWT_SECRET env var is not set in Postman environment.');",
+              "}",
+              "const encHeader = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(header)));",
+              "const encPayload = base64url(CryptoJS.enc.Utf8.parse(JSON.stringify(payload)));",
+              "const sig = CryptoJS.HmacSHA256(`${encHeader}.${encPayload}`, secret || '');",
+              "const encSig = base64url(sig);",
+              "pm.environment.set('mcp_token', `${encHeader}.${encPayload}.${encSig}`);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{mcp_token}}" },
+          { "key": "Content-Type", "value": "application/json" }
+        ],
+        "url": {
+          "raw": "{{base_mcp_url}}",
+          "host": ["{{base_mcp_url}}"]
+        },
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"jsonrpc\": \"2.0\",\n  \"id\": 1,\n  \"method\": \"tools.call\",\n  \"params\": {\n    \"name\": \"get_medical_records\",\n    \"arguments\": { \"patient_id\": \"{{patient_id}}\" }\n  }\n}"
+        }
+      }
+    },
+    {
+      "name": "Django • Mint Token (manual)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_django_url}}/mint-token/",
+          "host": ["{{base_django_url}}"],
+          "path": ["mint-token", ""]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Proxy • get_patient_records (form)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{proxy_token}}" }
+        ],
+        "url": {
+          "raw": "{{base_django_url}}/mcp-proxy/",
+          "host": ["{{base_django_url}}"],
+          "path": ["mcp-proxy", ""]
+        },
+        "body": {
+          "mode": "urlencoded",
+          "urlencoded": [
+            { "key": "tool", "value": "get_patient_records", "type": "text" },
+            { "key": "patient_id", "value": "{{patient_id}}", "type": "text" }
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
+

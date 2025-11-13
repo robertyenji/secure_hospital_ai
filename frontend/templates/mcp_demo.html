@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="text-2xl font-semibold mb-2">MCP Redaction Demo</h2>
+<p class="text-sm text-gray-600 mb-6">
+  MCP URL: <code class="bg-gray-100 px-1 py-0.5 rounded">{{ mcp_url }}</code>
+</p>
+
+<form
+  hx-post="{% url 'mcp_run' %}"
+  hx-target="#mcp-result"
+  hx-swap="innerHTML"
+  class="flex items-end gap-3 mb-6"
+>
+  {% csrf_token %}
+  <div>
+    <label class="block text-sm font-medium text-gray-700 mb-1">Patient ID</label>
+    <input name="patient_id" type="text" placeholder="e.g. paste an existing Patient ID"
+           class="border rounded px-3 py-2 w-72" required />
+  </div>
+  <button class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">
+    Run MCP
+  </button>
+  <div class="text-sm text-gray-500">Try an ID from your DB (admin → Patients)</div>
+</form>
+
+<div id="mcp-result" class="border rounded p-4 bg-white">
+  <p class="text-gray-500">Submit a Patient ID to see the redacted JSON response here.</p>
+</div>
+{% endblock %}

@@ -10,11 +10,60 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+# Load environment variables from a local .env file if python-dotenv is installed.
+# This allows using a .env file (created in the repo root) without exporting
+# variables in the shell. If python-dotenv isn't available we silently skip.
+try:
+    import importlib
+
+    dotenv = importlib.import_module('dotenv')
+    # load_dotenv accepts a path-like object in recent versions; ensure string
+    dotenv.load_dotenv(str(BASE_DIR / '.env'))
+except Exception:
+    # If python-dotenv is not installed or loading fails, continue —
+    # settings will rely on real environment variables.
+    pass
+
+# If a single DATABASE_URL isn't provided, allow building it from the
+# separate PG* environment variables (convenient for .env files that hold
+# PGHOST/PGUSER/PGPASSWORD/PGDATABASE/PGPORT). We URL-encode user/pass.
+# If DATABASE_URL is not provided, build it dynamically from PG* environment variables.
+if not os.environ.get('DATABASE_URL') and os.environ.get('PGHOST'):
+    try:
+        from urllib.parse import quote_plus
+
+        # Fetch environment variables
+        user = os.environ.get('PGUSER', '')
+        password = os.environ.get('PGPASSWORD', '')
+        host = os.environ.get('PGHOST', '')
+        port = os.environ.get('PGPORT', '5432')
+        dbname = os.environ.get('PGDATABASE', '')
+
+        # Validate all fields
+        if user and password and host and dbname:
+            # Safely URL-encode both username and password
+            user_enc = quote_plus(user)
+            pwd_enc = quote_plus(password)
+
+            # Construct full PostgreSQL connection string (Azure-compatible)
+            constructed = f"postgresql://{user_enc}:{pwd_enc}@{host}:{port}/{dbname}"
+
+            # Debug (optional) — print to confirm correctness during setup
+            print(f"[DEBUG] Constructed DATABASE_URL: {constructed}")
+
+            # Set for Django or dj_database_url to parse
+            os.environ['DATABASE_URL'] = constructed
+
+    except Exception as e:
+        print(f"[ERROR] Failed to build DATABASE_URL dynamically: {e}")
+        pass
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -37,7 +86,35 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "rest_framework",
+    "corsheaders",
+    'ehr.apps.EhrConfig',
+    'audit.apps.AuditConfig',
+    'frontend.apps.FrontendConfig',
 ]
+
+
+
+# Optional: DRF + SimpleJWT auth default (keeps things consistent if you use DRF views too)
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ),
+}
+
+# Use a dedicated signing key for JWTs (don’t reuse Django SECRET_KEY)
+SIMPLE_JWT = {
+    "ALGORITHM": "HS256",
+    "SIGNING_KEY": os.environ.get("AUTH_JWT_SECRET", "dev-override-change-me"),
+    "VERIFYING_KEY": None,  # (for RS256 this will be a public key)
+    "ACCESS_TOKEN_LIFETIME": timedelta(hours=8),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
+    "AUTH_HEADER_TYPES": ("Bearer",),
+    "USER_ID_FIELD": "id",
+    "USER_ID_CLAIM": "sub",
+}
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -72,12 +149,48 @@ WSGI_APPLICATION = 'secure_hospital_ai.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+# Database
+# This project prefers a single DATABASE_URL environment variable that
+# points to your Azure PostgreSQL instance (or any postgres instance).
+# When DATABASE_URL is present we parse it (optionally via
+# dj-database-url if installed) and enforce SSL for Azure.
+# If DATABASE_URL is not provided we fall back to a local SQLite file
+# so development remains simple.
+
+DATABASE_URL = os.environ.get('DATABASE_URL')
+if not DATABASE_URL:
+    raise RuntimeError(
+        "DATABASE_URL environment variable is required in this project for connecting to Azure Postgres.\n"
+        "Set DATABASE_URL to a postgresql://user:pass@host:port/dbname value before starting the app."
+    )
+
+try:
+    # Prefer dj-database-url when available (dynamic import avoids static linter errors)
+    import importlib
+
+    dj_database_url = importlib.import_module('dj_database_url')
+    DATABASES = {
+        'default': dj_database_url.parse(
+            DATABASE_URL, conn_max_age=int(os.environ.get('DB_CONN_MAX_AGE', 600)), ssl_require=True
+        )
     }
-}
+except Exception:
+    # Fallback parsing if dj-database-url is not installed.
+    from urllib.parse import urlparse
+
+    url = urlparse(DATABASE_URL)
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': url.path[1:],
+            'USER': url.username,
+            'PASSWORD': url.password,
+            'HOST': url.hostname,
+            'PORT': url.port or '5432',
+            'CONN_MAX_AGE': int(os.environ.get('DB_CONN_MAX_AGE', 600)),
+            'OPTIONS': {'sslmode': os.environ.get('DB_SSLMODE', 'require')},
+        }
+    }
 
 
 # Password validation
@@ -120,3 +233,11 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# Custom User Model
+AUTH_USER_MODEL = 'audit.User'
+LOGIN_URL = "/accounts/login/"
+LOGIN_REDIRECT_URL = "/frontend/"
+LOGOUT_REDIRECT_URL = "/accounts/login/"
+
+

@@ -1,0 +1,25 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Secure Hospital AI</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="{% static 'css/output.css' %}" rel="stylesheet" />
+  <script src="https://unpkg.com/htmx.org@1.9.12"></script>
+</head>
+<body class="bg-gray-50 text-gray-800">
+  <header class="bg-blue-700 text-white px-6 py-4">
+    <div class="max-w-6xl mx-auto flex items-center justify-between">
+      <h1 class="text-xl font-semibold">🏥 Secure Hospital AI (MCP Demo)</h1>
+      <a href="{% url 'mcp_demo' %}" class="text-white/90 hover:text-white underline">MCP Demo</a>
+    </div>
+  </header>
+  <main class="max-w-6xl mx-auto px-4 py-8">
+    {% block content %}{% endblock %}
+  </main>
+  <footer class="text-center text-sm text-gray-500 py-6">
+    © 2025 Secure Hospital AI – HIPAA-safe LLM integration
+  </footer>
+</body>
+</html>

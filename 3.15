@@ -1,0 +1,10 @@
+Collecting djangorestframework
+  Downloading djangorestframework-3.16.1-py3-none-any.whl.metadata (11 kB)
+Requirement already satisfied: django>=4.2 in c:\users\rober\envs\proj\lib\site-packages (from djangorestframework) (5.2.7)
+Requirement already satisfied: asgiref>=3.8.1 in c:\users\rober\envs\proj\lib\site-packages (from django>=4.2->djangorestframework) (3.10.0)
+Requirement already satisfied: sqlparse>=0.3.1 in c:\users\rober\envs\proj\lib\site-packages (from django>=4.2->djangorestframework) (0.5.3)
+Requirement already satisfied: tzdata in c:\users\rober\envs\proj\lib\site-packages (from django>=4.2->djangorestframework) (2025.2)
+Downloading djangorestframework-3.16.1-py3-none-any.whl (1.1 MB)
+   ---------------------------------------- 1.1/1.1 MB 1.6 MB/s  0:00:00
+Installing collected packages: djangorestframework
+Successfully installed djangorestframework-3.16.1
