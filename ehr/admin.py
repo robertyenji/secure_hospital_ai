@@ -76,5 +76,6 @@ class MedicalRecordAdmin(admin.ModelAdmin):
 @admin.register(Shift)
 class ShiftAdmin(admin.ModelAdmin):
     list_display = ("staff", "start_time", "end_time")
+    search_fields = ("staff__full_name", "staff__id")
     list_filter = ("staff__department",)
     ordering = ("-start_time",)

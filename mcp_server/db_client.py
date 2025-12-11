@@ -9,24 +9,18 @@ import os
 import psycopg2
 import psycopg2.extras
 from typing import Any, Dict, List, Optional
+from dotenv import load_dotenv
+load_dotenv()
 
 def _conn():
-    """
-    Open a DB connection for MCP.
-
-    Preference order:
-    1) DATABASE_URL (keeps MCP aligned with Django settings)
-    2) Individual PG* environment variables
-    """
-    dsn = os.getenv("DATABASE_URL")
+    """Open a DB connection for MCP."""
+    dsn = os.getenv("DATABASE_URL_MCP")
     if dsn:
-        # Allow sslmode from URL; cursor factory set here for dict rows
         return psycopg2.connect(
             dsn,
             cursor_factory=psycopg2.extras.DictCursor,
         )
 
-    # Fallback to discrete PG* vars (commonly used by MCP locally)
     return psycopg2.connect(
         host=os.getenv("PGHOST"),
         database=os.getenv("PGDATABASE"),
@@ -49,7 +43,7 @@ def _many(sql: str, params: tuple) -> List[Dict[str, Any]]:
         rows = cur.fetchall()
         return [dict(r) for r in rows]
 
-# === These names MUST match your main.py imports ===
+# === Patient Overview (Non-PHI) ===
 
 def get_patient_overview(patient_id: str) -> Optional[Dict[str, Any]]:
     sql = """
@@ -66,7 +60,13 @@ def get_patient_overview(patient_id: str) -> Optional[Dict[str, Any]]:
     """
     return _one(sql, (patient_id,))
 
+# === Patient PHI (Protected Health Information) ===
+
 def get_patient_phi(patient_id: str) -> Optional[Dict[str, Any]]:
+    """
+    Get Protected Health Information including SSN, full DOB, address, insurance.
+    REQUIRES: Admin, Doctor, Nurse, or Auditor role (enforced by MCP main.py)
+    """
     sql = """
         SELECT
             d.patient_id,
@@ -84,6 +84,8 @@ def get_patient_phi(patient_id: str) -> Optional[Dict[str, Any]]:
     """
     return _one(sql, (patient_id,))
 
+# === Admissions ===
+
 def get_admissions_for_patient(patient_id: str) -> List[Dict[str, Any]]:
     sql = """
         SELECT
@@ -97,6 +99,8 @@ def get_admissions_for_patient(patient_id: str) -> List[Dict[str, Any]]:
         ORDER BY a.admission_date DESC
     """
     return _many(sql, (patient_id,))
+
+# === Appointments ===
 
 def get_appointments_for_patient(patient_id: str) -> List[Dict[str, Any]]:
     sql = """
@@ -116,6 +120,8 @@ def get_appointments_for_patient(patient_id: str) -> List[Dict[str, Any]]:
     """
     return _many(sql, (patient_id,))
 
+# === Medical Records ===
+
 def get_medical_records_for_patient(patient_id: str) -> List[Dict[str, Any]]:
     sql = """
         SELECT
@@ -134,6 +140,8 @@ def get_medical_records_for_patient(patient_id: str) -> List[Dict[str, Any]]:
         ORDER BY mr.visit_date DESC
     """
     return _many(sql, (patient_id,))
+
+# === Staff Shifts ===
 
 def get_shifts_for_staff(staff_id: str) -> List[Dict[str, Any]]:
     sql = """

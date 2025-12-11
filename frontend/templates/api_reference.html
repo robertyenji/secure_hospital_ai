@@ -1,0 +1,1590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Reference - SecureHospital AI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary: #10b981;
+            --accent: #8b5cf6;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --dark: #0f172a;
+            --darker: #020617;
+            --card: #1e293b;
+            --card-hover: #334155;
+            --border: #334155;
+            --text: #f1f5f9;
+            --muted: #94a3b8;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--darker);
+            color: var(--text);
+            line-height: 1.7;
+            margin: 0;
+        }
+
+        /* Navigation */
+        .navbar {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 0;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--text) !important;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-decoration: none;
+        }
+
+        .brand-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-link {
+            color: var(--muted) !important;
+            font-weight: 500;
+            padding: 8px 16px !important;
+            border-radius: 8px;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: var(--text) !important;
+            background: var(--card);
+        }
+
+        /* Layout */
+        .docs-layout {
+            display: flex;
+            margin-top: 70px;
+            min-height: calc(100vh - 70px);
+        }
+
+        /* Sidebar */
+        .docs-sidebar {
+            width: 280px;
+            min-width: 280px;
+            background: var(--dark);
+            border-right: 1px solid var(--border);
+            padding: 30px 20px;
+            position: fixed;
+            top: 70px;
+            bottom: 0;
+            overflow-y: auto;
+        }
+
+        .sidebar-section {
+            margin-bottom: 28px;
+        }
+
+        .sidebar-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--muted);
+            margin-bottom: 12px;
+            padding-left: 12px;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-nav li a {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 12px;
+            color: var(--muted);
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-nav li a:hover {
+            background: var(--card);
+            color: var(--text);
+        }
+
+        .sidebar-nav li a.active {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--primary);
+            border-left-color: var(--primary);
+        }
+
+        .method-badge {
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 2px 6px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .method-get { background: rgba(16, 185, 129, 0.2); color: var(--secondary); }
+        .method-post { background: rgba(59, 130, 246, 0.2); color: var(--primary); }
+        .method-put { background: rgba(245, 158, 11, 0.2); color: var(--warning); }
+        .method-delete { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+
+        /* Main Content */
+        .docs-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 40px 60px 100px;
+            max-width: 1000px;
+        }
+
+        .docs-header {
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .docs-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, var(--text), var(--muted));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .docs-subtitle {
+            font-size: 1.1rem;
+            color: var(--muted);
+        }
+
+        /* Content Styles */
+        h2 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-top: 50px;
+            margin-bottom: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        h2:first-of-type {
+            border-top: none;
+            margin-top: 0;
+            padding-top: 0;
+        }
+
+        h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-top: 32px;
+            margin-bottom: 16px;
+            color: var(--primary);
+        }
+
+        p {
+            color: var(--muted);
+            margin-bottom: 16px;
+        }
+
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.85em;
+            background: var(--card);
+            padding: 3px 8px;
+            border-radius: 4px;
+            color: var(--secondary);
+        }
+
+        pre {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            overflow-x: auto;
+            margin: 20px 0;
+            position: relative;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: var(--text);
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--border);
+            margin: -20px -20px 16px -20px;
+            padding: 10px 16px;
+            border-radius: 12px 12px 0 0;
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+
+        .code-header .lang {
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .copy-btn {
+            background: var(--card);
+            border: 1px solid var(--border);
+            color: var(--muted);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        /* Endpoint Card */
+        .endpoint {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin: 24px 0;
+            overflow: hidden;
+        }
+
+        .endpoint-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            background: var(--dark);
+        }
+
+        .endpoint-method {
+            font-size: 0.8rem;
+            font-weight: 700;
+            padding: 6px 12px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .endpoint-method.get { background: var(--secondary); color: white; }
+        .endpoint-method.post { background: var(--primary); color: white; }
+        .endpoint-method.put { background: var(--warning); color: white; }
+        .endpoint-method.delete { background: var(--danger); color: white; }
+
+        .endpoint-path {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1rem;
+            color: var(--text);
+            flex: 1;
+        }
+
+        .endpoint-auth {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+
+        .endpoint-auth.required {
+            color: var(--warning);
+        }
+
+        .endpoint-auth.public {
+            color: var(--secondary);
+        }
+
+        .endpoint-body {
+            padding: 20px;
+        }
+
+        .endpoint-desc {
+            margin-bottom: 20px;
+        }
+
+        .endpoint-section {
+            margin-top: 20px;
+        }
+
+        .endpoint-section-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--muted);
+            margin-bottom: 12px;
+        }
+
+        /* Parameter Table */
+        .params-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.85rem;
+        }
+
+        .params-table th {
+            text-align: left;
+            padding: 10px 12px;
+            background: var(--dark);
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        .params-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--border);
+            color: var(--muted);
+        }
+
+        .params-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .param-name {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--primary);
+        }
+
+        .param-type {
+            font-size: 0.75rem;
+            background: var(--border);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: var(--muted);
+        }
+
+        .param-required {
+            font-size: 0.7rem;
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+
+        .param-optional {
+            font-size: 0.7rem;
+            background: rgba(100, 116, 139, 0.2);
+            color: var(--muted);
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        /* Response Example */
+        .response-example {
+            background: var(--dark);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        .response-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 16px;
+            background: var(--border);
+            font-size: 0.8rem;
+        }
+
+        .response-status {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+
+        .response-status.success { background: rgba(16, 185, 129, 0.2); color: var(--secondary); }
+        .response-status.error { background: rgba(239, 68, 68, 0.2); color: var(--danger); }
+
+        .response-body {
+            padding: 16px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text);
+            overflow-x: auto;
+        }
+
+        /* Info Boxes */
+        .info-box {
+            border-radius: 12px;
+            padding: 20px;
+            margin: 24px 0;
+            display: flex;
+            gap: 16px;
+        }
+
+        .info-box i {
+            font-size: 1.2rem;
+            margin-top: 2px;
+        }
+
+        .info-box-content h4 {
+            margin: 0 0 8px 0;
+            font-size: 1rem;
+        }
+
+        .info-box-content p {
+            margin: 0;
+            font-size: 0.9rem;
+        }
+
+        .info-box.info {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .info-box.info i { color: var(--primary); }
+
+        .info-box.warning {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .info-box.warning i { color: var(--warning); }
+
+        /* Footer */
+        .docs-footer {
+            margin-top: 60px;
+            padding-top: 30px;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .docs-footer a {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 20px;
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--muted);
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .docs-footer a:hover {
+            background: var(--card-hover);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Tabs */
+        .response-tabs {
+            display: flex;
+            gap: 4px;
+            margin-bottom: -1px;
+        }
+
+        .response-tab {
+            padding: 8px 16px;
+            background: var(--dark);
+            border: 1px solid var(--border);
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
+            color: var(--muted);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .response-tab.active {
+            background: var(--card);
+            color: var(--text);
+        }
+
+        .response-tab:hover:not(.active) {
+            color: var(--text);
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .docs-sidebar {
+                display: none;
+            }
+            .docs-content {
+                margin-left: 0;
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Navigation -->
+<nav class="navbar">
+    <div class="container-fluid px-4">
+        <div class="d-flex align-items-center justify-content-between w-100">
+            <a class="navbar-brand" href="/">
+                <div class="brand-icon">🏥</div>
+                SecureHospital AI
+            </a>
+            
+            <div class="d-flex align-items-center gap-2">
+                <a href="{% url 'frontend:documentation' %}" class="nav-link">Docs</a>
+                <a href="{% url 'frontend:api_reference' %}" class="nav-link active">API Reference</a>
+                <a href="https://github.com" target="_blank" class="nav-link">
+                    <i class="fab fa-github"></i>
+                </a>
+                <a href="{% url 'login' %}" class="btn btn-primary btn-sm ms-2">
+                    Try Demo <i class="fas fa-arrow-right ms-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+</nav>
+
+<div class="docs-layout">
+    <!-- Sidebar -->
+    <aside class="docs-sidebar">
+        <div class="sidebar-section">
+            <div class="sidebar-title">Overview</div>
+            <ul class="sidebar-nav">
+                <li><a href="#introduction" class="active"><i class="fas fa-book"></i> Introduction</a></li>
+                <li><a href="#authentication"><i class="fas fa-key"></i> Authentication</a></li>
+                <li><a href="#errors"><i class="fas fa-exclamation-triangle"></i> Error Handling</a></li>
+            </ul>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-title">Authentication</div>
+            <ul class="sidebar-nav">
+                <li>
+                    <a href="#login-endpoint">
+                        <span class="method-badge method-post">POST</span>
+                        /api/token/
+                    </a>
+                </li>
+                <li>
+                    <a href="#refresh-endpoint">
+                        <span class="method-badge method-post">POST</span>
+                        /api/token/refresh/
+                    </a>
+                </li>
+                <li>
+                    <a href="#whoami-endpoint">
+                        <span class="method-badge method-get">GET</span>
+                        /whoami/
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-title">Chat</div>
+            <ul class="sidebar-nav">
+                <li>
+                    <a href="#create-session">
+                        <span class="method-badge method-post">POST</span>
+                        /api/chat/session/
+                    </a>
+                </li>
+                <li>
+                    <a href="#list-sessions">
+                        <span class="method-badge method-get">GET</span>
+                        /api/chat/sessions/
+                    </a>
+                </li>
+                <li>
+                    <a href="#chat-history">
+                        <span class="method-badge method-get">GET</span>
+                        /api/chat/history/
+                    </a>
+                </li>
+                <li>
+                    <a href="#chat-stream">
+                        <span class="method-badge method-get">GET</span>
+                        /chat/stream/
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-title">Data</div>
+            <ul class="sidebar-nav">
+                <li>
+                    <a href="#sample-data">
+                        <span class="method-badge method-get">GET</span>
+                        /api/sample-data/
+                    </a>
+                </li>
+                <li>
+                    <a href="#demo-accounts">
+                        <span class="method-badge method-get">GET</span>
+                        /api/demo-accounts/
+                    </a>
+                </li>
+                <li>
+                    <a href="#audit-latest">
+                        <span class="method-badge method-get">GET</span>
+                        /audit-latest/
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="sidebar-section">
+            <div class="sidebar-title">MCP Tools</div>
+            <ul class="sidebar-nav">
+                <li><a href="#mcp-overview"><i class="fas fa-plug"></i> Overview</a></li>
+                <li><a href="#mcp-patient-overview"><i class="fas fa-user"></i> get_patient_overview</a></li>
+                <li><a href="#mcp-medical-records"><i class="fas fa-file-medical"></i> get_medical_records</a></li>
+                <li><a href="#mcp-patient-phi"><i class="fas fa-lock"></i> get_patient_phi</a></li>
+                <li><a href="#mcp-appointments"><i class="fas fa-calendar"></i> get_appointments</a></li>
+                <li><a href="#mcp-admissions"><i class="fas fa-hospital"></i> get_admissions</a></li>
+                <li><a href="#mcp-shifts"><i class="fas fa-clock"></i> get_my_shifts</a></li>
+            </ul>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="docs-content">
+        <div class="docs-header">
+            <h1 class="docs-title">API Reference</h1>
+            <p class="docs-subtitle">
+                Complete reference for SecureHospital AI REST APIs and MCP tools.
+            </p>
+        </div>
+
+        <!-- Introduction -->
+        <section id="introduction">
+            <h2>Introduction</h2>
+            <p>
+                The SecureHospital AI API provides programmatic access to the healthcare AI platform.
+                The API is organized around REST principles with JSON request/response bodies.
+            </p>
+
+            <h3>Base URL</h3>
+            <pre><code><div class="code-header"><span class="lang">URL</span></div>http://localhost:8000</code></pre>
+
+            <h3>Content Type</h3>
+            <p>All requests should include:</p>
+            <pre><code><div class="code-header"><span class="lang">Headers</span></div>Content-Type: application/json</code></pre>
+        </section>
+
+        <!-- Authentication -->
+        <section id="authentication">
+            <h2>Authentication</h2>
+            <p>
+                The API uses JWT (JSON Web Tokens) for authentication. Include the access token
+                in the Authorization header for protected endpoints.
+            </p>
+
+            <pre><code><div class="code-header"><span class="lang">Header</span></div>Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...</code></pre>
+
+            <div class="info-box warning">
+                <i class="fas fa-exclamation-triangle"></i>
+                <div class="info-box-content">
+                    <h4>Token Expiration</h4>
+                    <p>Access tokens expire after 60 minutes. Use the refresh endpoint to obtain a new access token.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Login Endpoint -->
+        <section id="login-endpoint">
+            <h3>Obtain Token</h3>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="endpoint-method post">POST</span>
+                    <span class="endpoint-path">/api/token/</span>
+                    <span class="endpoint-auth public"><i class="fas fa-globe"></i> Public</span>
+                </div>
+                <div class="endpoint-body">
+                    <p class="endpoint-desc">Authenticate and obtain JWT access and refresh tokens.</p>
+                    
+                    <div class="endpoint-section">
+                        <div class="endpoint-section-title">Request Body</div>
+                        <table class="params-table">
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="param-name">username</span> <span class="param-required">required</span></td>
+                                    <td><span class="param-type">string</span></td>
+                                    <td>User's username</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="param-name">password</span> <span class="param-required">required</span></td>
+                                    <td><span class="param-type">string</span></td>
+                                    <td>User's password</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="endpoint-section">
+                        <div class="endpoint-section-title">Example Request</div>
+                        <pre><code><div class="code-header"><span class="lang">cURL</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>curl -X POST http://localhost:8000/api/token/ \
+  -H "Content-Type: application/json" \
+  -d '{"username": "demo_doctor", "password": "DemoPass123!"}'</code></pre>
+                    </div>
+
+                    <div class="endpoint-section">
+                        <div class="endpoint-section-title">Response</div>
+                        <div class="response-example">
+                            <div class="response-header">
+                                <span class="response-status success">200 OK</span>
+                            </div>
+                            <div class="response-body">
+<pre>{
+  "access": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9...",
+  "refresh": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+}</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Refresh Endpoint -->
+        <section id="refresh-endpoint">
+            <h3>Refresh Token</h3>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="endpoint-method post">POST</span>
+                    <span class="endpoint-path">/api/token/refresh/</span>
+                    <span class="endpoint-auth public"><i class="fas fa-globe"></i> Public</span>
+                </div>
+                <div class="endpoint-body">
+                    <p class="endpoint-desc">Obtain a new access token using a refresh token.</p>
+                    
+                    <div class="endpoint-section">
+                        <div class="endpoint-section-title">Request Body</div>
+                        <table class="params-table">
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="param-name">refresh</span> <span class="param-required">required</span></td>
+                                    <td><span class="param-type">string</span></td>
+                                    <td>Refresh token from login</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="endpoint-section">
+                        <div class="endpoint-section-title">Response</div>
+                        <div class="response-example">
+                            <div class="response-header">
+                                <span class="response-status success">200 OK</span>
+                            </div>
+                            <div class="response-body">
+<pre>{
+  "access": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
+}</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Whoami Endpoint -->
+        <section id="whoami-endpoint">
+            <h3>Get Current User</h3>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="endpoint-method get">GET</span>
+                    <span class="endpoint-path">/whoami/</span>
+                    <span class="endpoint-auth required"><i class="fas fa-lock"></i> JWT Required</span>
+                </div>
+                <div class="endpoint-body">
+                    <p class="endpoint-desc">Get information about the currently authenticated user.</p>
+
+                    <div class="endpoint-section">
+                        <div class="endpoint-section-title">Response</div>
+                        <div class="response-example">
+                            <div class="response-header">
+                                <span class="response-status success">200 OK</span>
+                            </div>
+                            <div class="response-body">
+<pre>{
+  "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+  "username": "demo_doctor",
+  "role": "Doctor",
+  "email": "doctor@demo.local",
+  "staff_id": "STF001",
+  "staff_name": "Dr. Craig Hawkins",
+  "department": "Internal Medicine"
+}</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Error Handling -->
+        <section id="errors">
+            <h2>Error Handling</h2>
+            <p>The API returns standard HTTP status codes and JSON error responses.</p>
+
+            <table class="params-table">
+                <thead>
+                    <tr>
+                        <th>Status Code</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>200</code></td>
+                        <td>Success</td>
+                    </tr>
+                    <tr>
+                        <td><code>400</code></td>
+                        <td>Bad Request - Invalid parameters</td>
+                    </tr>
+                    <tr>
+                        <td><code>401</code></td>
+                        <td>Unauthorized - Invalid or missing token</td>
+                    </tr>
+                    <tr>
+                        <td><code>403</code></td>
+                        <td>Forbidden - RBAC access denied</td>
+                    </tr>
+                    <tr>
+                        <td><code>404</code></td>
+                        <td>Not Found - Resource doesn't exist</td>
+                    </tr>
+                    <tr>
+                        <td><code>500</code></td>
+                        <td>Server Error</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div class="endpoint-section">
+                <div class="endpoint-section-title">Error Response Format</div>
+                <div class="response-example">
+                    <div class="response-header">
+                        <span class="response-status error">403 Forbidden</span>
+                    </div>
+                    <div class="response-body">
+<pre>{
+  "error": "Access denied",
+  "message": "Your role (Reception) does not have permission to access medical records",
+  "code": "RBAC_DENIED"
+}</pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Create Session -->
+        <section id="create-session">
+            <h2>Chat Endpoints</h2>
+            <h3>Create Chat Session</h3>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="endpoint-method post">POST</span>
+                    <span class="endpoint-path">/api/chat/session/</span>
+                    <span class="endpoint-auth required"><i class="fas fa-lock"></i> JWT Required</span>
+                </div>
+                <div class="endpoint-body">
+                    <p class="endpoint-desc">Create a new chat session for the authenticated user.</p>
+
+                    <div class="endpoint-section">
+                        <div class="endpoint-section-title">Response</div>
+                        <div class="response-example">
+                            <div class="response-header">
+                                <span class="response-status success">200 OK</span>
+                            </div>
+                            <div class="response-body">
+<pre>{
+  "session_id": "f8c7b6a5-4d3c-2e1f-0a9b-8c7d6e5f4a3b",
+  "title": "New Chat",
+  "created_at": "2024-12-08T14:30:00Z"
+}</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- List Sessions -->
+        <section id="list-sessions">
+            <h3>List Chat Sessions</h3>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="endpoint-method get">GET</span>
+                    <span class="endpoint-path">/api/chat/sessions/</span>
+                    <span class="endpoint-auth required"><i class="fas fa-lock"></i> JWT Required</span>
+                </div>
+                <div class="endpoint-body">
+                    <p class="endpoint-desc">List all chat sessions for the authenticated user, ordered by most recent.</p>
+
+                    <div class="endpoint-section">
+                        <div class="endpoint-section-title">Response</div>
+                        <div class="response-example">
+                            <div class="response-header">
+                                <span class="response-status success">200 OK</span>
+                            </div>
+                            <div class="response-body">
+<pre>{
+  "sessions": [
+    {
+      "session_id": "f8c7b6a5-4d3c-2e1f-0a9b-8c7d6e5f4a3b",
+      "title": "Medical Records: FCE57",
+      "updated_at": "2024-12-08T14:35:00Z"
+    },
+    {
+      "session_id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "title": "Patient Appointments",
+      "updated_at": "2024-12-08T10:20:00Z"
+    }
+  ]
+}</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Chat History -->
+        <section id="chat-history">
+            <h3>Get Chat History</h3>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="endpoint-method get">GET</span>
+                    <span class="endpoint-path">/api/chat/history/</span>
+                    <span class="endpoint-auth required"><i class="fas fa-lock"></i> JWT Required</span>
+                </div>
+                <div class="endpoint-body">
+                    <p class="endpoint-desc">Get all messages for a specific chat session.</p>
+
+                    <div class="endpoint-section">
+                        <div class="endpoint-section-title">Query Parameters</div>
+                        <table class="params-table">
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="param-name">session_id</span> <span class="param-required">required</span></td>
+                                    <td><span class="param-type">uuid</span></td>
+                                    <td>ID of the chat session</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="endpoint-section">
+                        <div class="endpoint-section-title">Response</div>
+                        <div class="response-example">
+                            <div class="response-header">
+                                <span class="response-status success">200 OK</span>
+                            </div>
+                            <div class="response-body">
+<pre>{
+  "session_id": "f8c7b6a5-4d3c-2e1f-0a9b-8c7d6e5f4a3b",
+  "title": "Medical Records: FCE57",
+  "messages": [
+    {
+      "role": "user",
+      "content": "Get medical records for patient FCE57",
+      "created_at": "2024-12-08T14:30:00Z"
+    },
+    {
+      "role": "assistant",
+      "content": "Here are the medical records for patient FCE57...",
+      "created_at": "2024-12-08T14:30:05Z"
+    }
+  ]
+}</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Chat Stream -->
+        <section id="chat-stream">
+            <h3>Chat Stream (SSE)</h3>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="endpoint-method get">GET</span>
+                    <span class="endpoint-path">/chat/stream/</span>
+                    <span class="endpoint-auth required"><i class="fas fa-lock"></i> Session Auth</span>
+                </div>
+                <div class="endpoint-body">
+                    <p class="endpoint-desc">Stream AI responses using Server-Sent Events (SSE). Returns real-time chunks as the AI generates its response.</p>
+
+                    <div class="endpoint-section">
+                        <div class="endpoint-section-title">Query Parameters</div>
+                        <table class="params-table">
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="param-name">session_id</span> <span class="param-required">required</span></td>
+                                    <td><span class="param-type">uuid</span></td>
+                                    <td>ID of the chat session</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="param-name">message</span> <span class="param-required">required</span></td>
+                                    <td><span class="param-type">string</span></td>
+                                    <td>User's message</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="endpoint-section">
+                        <div class="endpoint-section-title">SSE Events</div>
+                        <table class="params-table">
+                            <thead>
+                                <tr>
+                                    <th>Event</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><code>chunk</code></td>
+                                    <td>Text chunk from AI response</td>
+                                </tr>
+                                <tr>
+                                    <td><code>tool_call</code></td>
+                                    <td>MCP tool invocation</td>
+                                </tr>
+                                <tr>
+                                    <td><code>tool_result</code></td>
+                                    <td>Result from MCP tool</td>
+                                </tr>
+                                <tr>
+                                    <td><code>session_update</code></td>
+                                    <td>Session title changed</td>
+                                </tr>
+                                <tr>
+                                    <td><code>end</code></td>
+                                    <td>Stream complete</td>
+                                </tr>
+                                <tr>
+                                    <td><code>error</code></td>
+                                    <td>Error occurred</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="endpoint-section">
+                        <div class="endpoint-section-title">Example Usage (JavaScript)</div>
+                        <pre><code><div class="code-header"><span class="lang">JavaScript</span><button class="copy-btn" onclick="copyCode(this)">Copy</button></div>const params = new URLSearchParams({
+  session_id: "f8c7b6a5-4d3c-2e1f-0a9b-8c7d6e5f4a3b",
+  message: "Get medical records for FCE57"
+});
+
+const es = new EventSource(`/chat/stream/?${params}`);
+
+es.addEventListener("chunk", (e) => {
+  const data = JSON.parse(e.data);
+  console.log("Chunk:", data.delta);
+});
+
+es.addEventListener("tool_call", (e) => {
+  const data = JSON.parse(e.data);
+  console.log("Tool:", data.tool_name);
+});
+
+es.addEventListener("end", () => {
+  es.close();
+});</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sample Data -->
+        <section id="sample-data">
+            <h2>Data Endpoints</h2>
+            <h3>Get Sample Data</h3>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="endpoint-method get">GET</span>
+                    <span class="endpoint-path">/api/sample-data/</span>
+                    <span class="endpoint-auth required"><i class="fas fa-lock"></i> JWT Required</span>
+                </div>
+                <div class="endpoint-body">
+                    <p class="endpoint-desc">Get sample patients and staff for testing. Returns random records from the database.</p>
+
+                    <div class="endpoint-section">
+                        <div class="endpoint-section-title">Response</div>
+                        <div class="response-example">
+                            <div class="response-header">
+                                <span class="response-status success">200 OK</span>
+                            </div>
+                            <div class="response-body">
+<pre>{
+  "patients": [
+    {
+      "patient_id": "FCE57",
+      "name": "Leah Arnold",
+      "gender": "F",
+      "birth_year": "1985"
+    },
+    {
+      "patient_id": "6VCB8",
+      "name": "Michael Chen",
+      "gender": "M",
+      "birth_year": "1972"
+    }
+  ],
+  "staff": [
+    {
+      "staff_id": "STF001",
+      "name": "Dr. Craig Hawkins",
+      "username": "demo_doctor",
+      "role": "Doctor",
+      "department": "Internal Medicine"
+    }
+  ]
+}</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Demo Accounts -->
+        <section id="demo-accounts">
+            <h3>Get Demo Accounts</h3>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="endpoint-method get">GET</span>
+                    <span class="endpoint-path">/api/demo-accounts/</span>
+                    <span class="endpoint-auth public"><i class="fas fa-globe"></i> Public</span>
+                </div>
+                <div class="endpoint-body">
+                    <p class="endpoint-desc">Get list of demo accounts for testing. This is a public endpoint used by the landing page.</p>
+
+                    <div class="endpoint-section">
+                        <div class="endpoint-section-title">Response</div>
+                        <div class="response-example">
+                            <div class="response-header">
+                                <span class="response-status success">200 OK</span>
+                            </div>
+                            <div class="response-body">
+<pre>{
+  "accounts": [
+    {
+      "username": "demo_doctor",
+      "role": "Doctor",
+      "name": "Dr. Craig Hawkins",
+      "staff_id": "STF001"
+    },
+    {
+      "username": "demo_nurse",
+      "role": "Nurse",
+      "name": "Sarah Johnson",
+      "staff_id": "STF002"
+    }
+  ],
+  "default_password": "DemoPass123!"
+}</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Audit Latest -->
+        <section id="audit-latest">
+            <h3>Get Recent Audit Logs</h3>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="endpoint-method get">GET</span>
+                    <span class="endpoint-path">/audit-latest/</span>
+                    <span class="endpoint-auth required"><i class="fas fa-lock"></i> JWT Required</span>
+                </div>
+                <div class="endpoint-body">
+                    <p class="endpoint-desc">Get the 10 most recent audit log entries.</p>
+
+                    <div class="endpoint-section">
+                        <div class="endpoint-section-title">Response</div>
+                        <div class="response-example">
+                            <div class="response-header">
+                                <span class="response-status success">200 OK</span>
+                            </div>
+                            <div class="response-body">
+<pre>{
+  "items": [
+    {
+      "id": "a1b2c3d4-e5f6-7890-abcd-ef1234567890",
+      "action": "TOOL_CALL",
+      "table_name": "medical_records",
+      "timestamp": "2024-12-08T14:30:05Z",
+      "user_id": "demo_doctor"
+    },
+    {
+      "id": "b2c3d4e5-f6a7-8901-bcde-f23456789012",
+      "action": "ACCESS_GRANTED",
+      "table_name": "patients",
+      "timestamp": "2024-12-08T14:30:02Z",
+      "user_id": "demo_doctor"
+    }
+  ]
+}</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MCP Overview -->
+        <section id="mcp-overview">
+            <h2>MCP Tools</h2>
+            <p>
+                MCP (Model Context Protocol) tools are invoked by the AI to access healthcare data.
+                Each tool enforces RBAC and logs all access to the audit trail.
+            </p>
+
+            <div class="info-box info">
+                <i class="fas fa-info-circle"></i>
+                <div class="info-box-content">
+                    <h4>Tool Invocation</h4>
+                    <p>MCP tools are called automatically by the AI based on user queries. You don't call them directly - the AI decides which tools to use.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- MCP Patient Overview -->
+        <section id="mcp-patient-overview">
+            <h3>get_patient_overview</h3>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="endpoint-method post">TOOL</span>
+                    <span class="endpoint-path">get_patient_overview</span>
+                    <span class="endpoint-auth public"><i class="fas fa-users"></i> All Roles</span>
+                </div>
+                <div class="endpoint-body">
+                    <p class="endpoint-desc">Get basic patient demographics including name, gender, and date of birth.</p>
+
+                    <div class="endpoint-section">
+                        <div class="endpoint-section-title">Parameters</div>
+                        <table class="params-table">
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="param-name">patient_id</span> <span class="param-required">required</span></td>
+                                    <td><span class="param-type">string</span></td>
+                                    <td>Patient identifier (e.g., "FCE57")</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MCP Medical Records -->
+        <section id="mcp-medical-records">
+            <h3>get_medical_records</h3>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="endpoint-method post">TOOL</span>
+                    <span class="endpoint-path">get_medical_records</span>
+                    <span class="endpoint-auth required"><i class="fas fa-user-md"></i> Doctor, Nurse, Auditor</span>
+                </div>
+                <div class="endpoint-body">
+                    <p class="endpoint-desc">Get clinical notes, diagnoses, and treatment information.</p>
+
+                    <div class="endpoint-section">
+                        <div class="endpoint-section-title">Parameters</div>
+                        <table class="params-table">
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="param-name">patient_id</span> <span class="param-required">required</span></td>
+                                    <td><span class="param-type">string</span></td>
+                                    <td>Patient identifier</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MCP Patient PHI -->
+        <section id="mcp-patient-phi">
+            <h3>get_patient_phi</h3>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="endpoint-method post">TOOL</span>
+                    <span class="endpoint-path">get_patient_phi</span>
+                    <span class="endpoint-auth required"><i class="fas fa-lock"></i> Doctor, Admin, Auditor</span>
+                </div>
+                <div class="endpoint-body">
+                    <p class="endpoint-desc">Get Protected Health Information including SSN, addresses, and insurance details.</p>
+
+                    <div class="endpoint-section">
+                        <div class="endpoint-section-title">Parameters</div>
+                        <table class="params-table">
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="param-name">patient_id</span> <span class="param-required">required</span></td>
+                                    <td><span class="param-type">string</span></td>
+                                    <td>Patient identifier</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="info-box warning">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <div class="info-box-content">
+                            <h4>Restricted Access</h4>
+                            <p>This tool returns sensitive PHI. Access is logged and requires elevated permissions.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MCP Appointments -->
+        <section id="mcp-appointments">
+            <h3>get_appointments</h3>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="endpoint-method post">TOOL</span>
+                    <span class="endpoint-path">get_appointments</span>
+                    <span class="endpoint-auth required"><i class="fas fa-calendar"></i> All Clinical Roles</span>
+                </div>
+                <div class="endpoint-body">
+                    <p class="endpoint-desc">Get patient appointment history and upcoming appointments.</p>
+
+                    <div class="endpoint-section">
+                        <div class="endpoint-section-title">Parameters</div>
+                        <table class="params-table">
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="param-name">patient_id</span> <span class="param-required">required</span></td>
+                                    <td><span class="param-type">string</span></td>
+                                    <td>Patient identifier</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MCP Admissions -->
+        <section id="mcp-admissions">
+            <h3>get_admissions</h3>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="endpoint-method post">TOOL</span>
+                    <span class="endpoint-path">get_admissions</span>
+                    <span class="endpoint-auth required"><i class="fas fa-hospital"></i> Doctor, Nurse, Admin</span>
+                </div>
+                <div class="endpoint-body">
+                    <p class="endpoint-desc">Get patient hospital admission history.</p>
+
+                    <div class="endpoint-section">
+                        <div class="endpoint-section-title">Parameters</div>
+                        <table class="params-table">
+                            <thead>
+                                <tr>
+                                    <th>Parameter</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="param-name">patient_id</span> <span class="param-required">required</span></td>
+                                    <td><span class="param-type">string</span></td>
+                                    <td>Patient identifier</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MCP Shifts -->
+        <section id="mcp-shifts">
+            <h3>get_my_shifts</h3>
+            
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="endpoint-method post">TOOL</span>
+                    <span class="endpoint-path">get_my_shifts</span>
+                    <span class="endpoint-auth public"><i class="fas fa-clock"></i> All Staff</span>
+                </div>
+                <div class="endpoint-body">
+                    <p class="endpoint-desc">Get the current user's scheduled shifts.</p>
+
+                    <div class="endpoint-section">
+                        <div class="endpoint-section-title">Parameters</div>
+                        <p>No parameters required. Uses the authenticated user's staff ID.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer Navigation -->
+        <div class="docs-footer">
+            <a href="{% url 'frontend:documentation' %}">
+                <i class="fas fa-arrow-left"></i> Documentation
+            </a>
+            <a href="/">
+                Back to Home <i class="fas fa-arrow-right"></i>
+            </a>
+        </div>
+    </main>
+</div>
+
+<script>
+function copyCode(btn) {
+    const pre = btn.closest('pre');
+    const code = pre.querySelector('code');
+    const text = code.innerText.split('\n').slice(1).join('\n');
+    
+    navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = 'Copied!';
+        setTimeout(() => btn.textContent = 'Copy', 2000);
+    });
+}
+
+// Highlight current section in sidebar
+document.addEventListener('scroll', () => {
+    const sections = document.querySelectorAll('section[id]');
+    const navLinks = document.querySelectorAll('.sidebar-nav a');
+    
+    let current = '';
+    sections.forEach(section => {
+        const sectionTop = section.offsetTop - 100;
+        if (scrollY >= sectionTop) {
+            current = section.getAttribute('id');
+        }
+    });
+    
+    navLinks.forEach(link => {
+        link.classList.remove('active');
+        if (link.getAttribute('href') === '#' + current) {
+            link.classList.add('active');
+        }
+    });
+});
+</script>
+
+</body>
+</html>

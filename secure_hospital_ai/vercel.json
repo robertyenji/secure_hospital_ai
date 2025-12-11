@@ -1,0 +1,50 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "secure_hospital_ai/wsgi.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "50mb",
+        "runtime": "python3.11"
+      }
+    },
+    {
+      "src": "mcp_server/vercel_app.py",
+      "use": "@vercel/python",
+      "config": {
+        "maxLambdaSize": "50mb",
+        "runtime": "python3.11"
+      }
+    }
+  ],
+  "routes": [
+    {
+      "src": "/mcp",
+      "dest": "mcp_server/vercel_app.py"
+    },
+    {
+      "src": "/mcp/(.*)",
+      "dest": "mcp_server/vercel_app.py"
+    },
+    {
+      "src": "/health",
+      "dest": "mcp_server/vercel_app.py"
+    },
+    {
+      "src": "/tools",
+      "dest": "mcp_server/vercel_app.py"
+    },
+    {
+      "src": "/rbac",
+      "dest": "mcp_server/vercel_app.py"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "secure_hospital_ai/wsgi.py"
+    }
+  ],
+  "env": {
+    "DJANGO_SETTINGS_MODULE": "secure_hospital_ai.settings_prod"
+  }
+}

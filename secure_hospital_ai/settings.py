@@ -69,15 +69,17 @@ if not os.environ.get('DATABASE_URL') and os.environ.get('PGHOST'):
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-k%e#ve-=beea0m9qr&x71a9@^%jbjq^11mrqx9s_o&1m$_ehou'
+SECRET_KEY  = os.getenv("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
 
+# ================================
+# OpenAI Configuration
+# ================================
 
-# Application definition
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -104,17 +106,20 @@ REST_FRAMEWORK = {
 }
 
 # Use a dedicated signing key for JWTs (don’t reuse Django SECRET_KEY)
+# ================================
+# JWT CONFIG - MUST USE SECRET_KEY
+# ================================
+# SimplJWT configuration
 SIMPLE_JWT = {
     "ALGORITHM": "HS256",
-    "SIGNING_KEY": os.environ.get("AUTH_JWT_SECRET", "dev-override-change-me"),
-    "VERIFYING_KEY": None,  # (for RS256 this will be a public key)
+    "SIGNING_KEY": SECRET_KEY,  # ← USE SECRET_KEY, not AUTH_JWT_SECRET
+    "VERIFYING_KEY": None,
     "ACCESS_TOKEN_LIFETIME": timedelta(hours=8),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=7),
     "AUTH_HEADER_TYPES": ("Bearer",),
     "USER_ID_FIELD": "id",
-    "USER_ID_CLAIM": "sub",
+    "USER_ID_CLAIM": "user_id",  # ← Changed from "sub" to "user_id"
 }
-
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -236,8 +241,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Custom User Model
 AUTH_USER_MODEL = 'audit.User'
-LOGIN_URL = "/accounts/login/"
-LOGIN_REDIRECT_URL = "/frontend/"
-LOGOUT_REDIRECT_URL = "/accounts/login/"
+# Login/Logout Redirects
+LOGIN_REDIRECT_URL = 'frontend:dashboard'
+LOGOUT_REDIRECT_URL = "/"
+LOGIN_URL = 'frontend:login'
+# ================================
+# OpenAI Configuration
+# ================================
+OPENAI_API_KEY = os.getenv("OPENAI_API_KEY") or os.getenv("OPENAI_KEY") or os.getenv("LLM_API_KEY")
 
-
+if not OPENAI_API_KEY:
+    print("WARNING: OPENAI_API_KEY not set!")
