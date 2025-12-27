@@ -1,0 +1,1 @@
+-- @pgsql Chat Query Editor (hopsserver001.postgres.database.azure.com)

@@ -1,0 +1,21 @@
+# MCP Server - Standalone Dependencies
+# No Django required
+
+# Web Framework
+fastapi==0.109.0
+uvicorn[standard]==0.27.0
+
+# Database
+psycopg2-binary==2.9.9
+
+# Authentication
+PyJWT==2.8.0
+
+# Data Validation
+pydantic==2.5.3
+
+# Environment
+python-dotenv==1.0.0
+
+# CORS & HTTP
+starlette==0.35.1

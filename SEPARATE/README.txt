@@ -1,0 +1,2 @@
+Here the mcp-server and Django are separate applications. You can deploy each independently and link them using the an MCP URL in Django Frontend app - view.py
+-Make sure they both use the same Secrete-Key. 

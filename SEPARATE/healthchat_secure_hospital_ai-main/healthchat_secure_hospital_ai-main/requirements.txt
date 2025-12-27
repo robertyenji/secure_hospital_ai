@@ -1,0 +1,27 @@
+# Django and core dependencies
+Django>=5.2,<5.3
+djangorestframework>=3.15.0
+djangorestframework-simplejwt>=5.3.0
+django-cors-headers>=4.3.0
+
+# Database
+psycopg2-binary>=2.9.9
+dj-database-url>=2.1.0
+
+# Environment variables
+python-dotenv>=1.0.0
+
+# OpenAI for LLM integration
+openai>=1.40.0
+
+# HTTP requests (for MCP proxy)
+requests>=2.31.0
+
+# Data generation for seeding
+Faker>=24.0.0
+
+# Production server
+gunicorn>=21.2.0
+
+# Static files for production
+whitenoise>=6.6.0

@@ -1,0 +1,36 @@
+{% if error %}
+  <div class="bg-red-50 border border-red-200 text-red-800 p-3 rounded mb-4">
+    <strong>Error:</strong> {{ error }}
+  </div>
+{% endif %}
+
+{% if status %}
+  <div class="bg-gray-50 border border-gray-200 text-gray-700 p-3 rounded mb-4">
+    <strong>Status:</strong> {{ status }}
+  </div>
+{% endif %}
+
+<div class="grid md:grid-cols-2 gap-6">
+  <div>
+    <h3 class="font-semibold mb-2">📤 Request Sent</h3>
+    <pre class="bg-black text-green-200 p-3 rounded overflow-x-auto text-sm">{{ pretty_request }}</pre>
+  </div>
+
+  <div>
+    <h3 class="font-semibold mb-2">📥 Full MCP Response</h3>
+    {% if pretty_response %}
+      <pre class="bg-black text-blue-200 p-3 rounded overflow-x-auto text-sm">{{ pretty_response }}</pre>
+    {% else %}
+      <div class="text-gray-500">No response body.</div>
+    {% endif %}
+  </div>
+
+  <div class="md:col-span-2">
+    <h3 class="font-semibold mb-2">✅ Redacted Data (LLM-safe)</h3>
+    {% if pretty_redacted and pretty_redacted != "{}" %}
+      <pre class="bg-black text-emerald-200 p-3 rounded overflow-x-auto text-sm">{{ pretty_redacted }}</pre>
+    {% else %}
+      <div class="text-gray-500">No data found (check Patient ID).</div>
+    {% endif %}
+  </div>
+</div>

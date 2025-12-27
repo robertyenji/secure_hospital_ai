@@ -1,0 +1,368 @@
+<!-- templates/legal/disclaimer.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disclaimer - SecureHospital AI</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --dark: #0f172a;
+            --darker: #020617;
+            --card: #1e293b;
+            --border: #334155;
+            --primary: #3b82f6;
+            --text: #f1f5f9;
+            --muted: #94a3b8;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background: var(--darker);
+            color: var(--text);
+            line-height: 1.7;
+        }
+
+        .navbar {
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 0;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            color: var(--text) !important;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .brand-icon {
+            width: 36px;
+            height: 36px;
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .content-wrapper {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 60px 20px 100px;
+        }
+
+        .page-header {
+            margin-bottom: 40px;
+            padding-bottom: 30px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 16px;
+        }
+
+        .last-updated {
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-top: 40px;
+            margin-bottom: 16px;
+            color: var(--primary);
+        }
+
+        p, li {
+            color: var(--muted);
+        }
+
+        ul {
+            padding-left: 24px;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        .alert-box {
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.1);
+            border: 2px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .alert-danger .alert-title {
+            color: #fca5a5;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-danger p {
+            color: #fca5a5;
+            margin: 0;
+        }
+
+        .alert-warning {
+            background: rgba(245, 158, 11, 0.1);
+            border: 2px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .alert-warning .alert-title {
+            color: #fcd34d;
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-warning p {
+            color: #fcd34d;
+            margin: 0;
+        }
+
+        .info-box {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+        }
+
+        .info-box h3 {
+            color: var(--text);
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        a {
+            color: var(--primary);
+        }
+
+        .footer {
+            background: var(--dark);
+            border-top: 1px solid var(--border);
+            padding: 30px 0;
+            text-align: center;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+
+        .footer-links a:hover {
+            color: var(--primary);
+        }
+
+        .key-points {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 16px;
+            margin: 30px 0;
+        }
+
+        .key-point {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .key-point i {
+            font-size: 2rem;
+            margin-bottom: 12px;
+        }
+
+        .key-point.danger i { color: var(--danger); }
+        .key-point.warning i { color: var(--warning); }
+        .key-point.info i { color: var(--primary); }
+
+        .key-point h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .key-point p {
+            font-size: 0.85rem;
+            margin: 0;
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar">
+    <div class="container">
+        <a class="navbar-brand" href="/">
+            <div class="brand-icon">🏥</div>
+            SecureHospital AI
+        </a>
+        <a href="/" class="btn btn-outline-light btn-sm">
+            <i class="fas fa-arrow-left me-2"></i> Back to Home
+        </a>
+    </div>
+</nav>
+
+<div class="content-wrapper">
+    <div class="page-header">
+        <h1 class="page-title">Disclaimer</h1>
+        <p class="last-updated">Last Updated: December 2024</p>
+    </div>
+
+    <div class="alert-box alert-danger">
+        <div class="alert-title">
+            <i class="fas fa-exclamation-circle"></i>
+            CRITICAL: NOT FOR MEDICAL USE
+        </div>
+        <p>SecureHospital AI is a DEMONSTRATION SYSTEM ONLY. It must NOT be used for actual medical diagnosis, treatment decisions, or patient care. All data in this system is synthetic and fictional.</p>
+    </div>
+
+    <div class="key-points">
+        <div class="key-point danger">
+            <i class="fas fa-heartbeat"></i>
+            <h4>No Medical Advice</h4>
+            <p>AI responses are not medical advice and should never replace professional healthcare consultation.</p>
+        </div>
+        
+        <div class="key-point warning">
+            <i class="fas fa-database"></i>
+            <h4>Synthetic Data Only</h4>
+            <p>All patient data, records, and information are completely fictional and generated for demonstration.</p>
+        </div>
+        
+        <div class="key-point info">
+            <i class="fas fa-graduation-cap"></i>
+            <h4>Educational Purpose</h4>
+            <p>This platform exists solely to demonstrate healthcare AI security architecture and best practices.</p>
+        </div>
+    </div>
+
+    <h2>1. Purpose of This System</h2>
+    <p>SecureHospital AI is designed exclusively for:</p>
+    <ul>
+        <li>Demonstrating AI integration in healthcare applications</li>
+        <li>Showcasing security best practices (RBAC, audit logging, PHI protection)</li>
+        <li>Educational purposes and portfolio demonstration</li>
+        <li>Technical architecture reference for developers</li>
+    </ul>
+
+    <h2>2. No Medical Advice</h2>
+    <div class="alert-box alert-warning">
+        <div class="alert-title">
+            <i class="fas fa-stethoscope"></i>
+            Medical Disclaimer
+        </div>
+        <p>The AI assistant in this system does NOT provide medical advice. Any health-related responses are generated for demonstration purposes only and should NEVER be relied upon for medical decisions.</p>
+    </div>
+    
+    <p>If you have medical concerns, please consult a qualified healthcare professional. Never disregard professional medical advice or delay seeking it because of something you read or see in this demonstration system.</p>
+
+    <h2>3. Synthetic Data</h2>
+    <p>All data in SecureHospital AI is:</p>
+    <ul>
+        <li><strong>Completely fictional</strong> - Generated using randomized algorithms</li>
+        <li><strong>Not based on real patients</strong> - No actual medical records were used</li>
+        <li><strong>For demonstration only</strong> - Shows how data would appear in a real system</li>
+    </ul>
+
+    <div class="info-box">
+        <h3><i class="fas fa-info-circle me-2" style="color: var(--primary);"></i> About the Demo Data</h3>
+        <p>Patient names, IDs, medical records, and all other information are randomly generated. Any resemblance to real persons, living or deceased, or actual medical conditions is purely coincidental.</p>
+    </div>
+
+    <h2>4. AI Limitations</h2>
+    <p>The AI assistant in this system:</p>
+    <ul>
+        <li>May generate inaccurate or incomplete information</li>
+        <li>Does not have access to real medical knowledge bases</li>
+        <li>Cannot verify the accuracy of its responses</li>
+        <li>Should not be trusted for any real-world decisions</li>
+    </ul>
+
+    <h2>5. Security Demonstration</h2>
+    <p>While this system demonstrates security best practices, it is:</p>
+    <ul>
+        <li>Not audited for production healthcare use</li>
+        <li>Not HIPAA certified (though it demonstrates HIPAA patterns)</li>
+        <li>A reference implementation, not a hardened production system</li>
+    </ul>
+
+    <h2>6. Limitation of Liability</h2>
+    <p>By using SecureHospital AI, you acknowledge and agree that:</p>
+    <ul>
+        <li>The creators bear no responsibility for any decisions made based on information from this system</li>
+        <li>You will not use this system with real patient data</li>
+        <li>You understand this is a demonstration only</li>
+        <li>Any use of this system is at your own risk</li>
+    </ul>
+
+    <h2>7. Professional Use</h2>
+    <p>Healthcare professionals should understand that this system:</p>
+    <ul>
+        <li>Does not meet clinical software standards</li>
+        <li>Has not undergone medical device certification</li>
+        <li>Should not be integrated into clinical workflows</li>
+        <li>Is not suitable for patient care environments</li>
+    </ul>
+
+    <div class="alert-box alert-danger" style="margin-top: 40px;">
+        <div class="alert-title">
+            <i class="fas fa-hand-paper"></i>
+            Final Warning
+        </div>
+        <p>DO NOT enter real patient information into this system. DO NOT use AI responses for medical decisions. This is a DEMO ONLY.</p>
+    </div>
+
+    <h2>8. Questions</h2>
+    <p>If you have questions about this disclaimer or the appropriate use of this demonstration system, please contact the project maintainer.</p>
+</div>
+
+<footer class="footer">
+    <div class="container">
+        <div class="footer-links">
+            <a href="{% url 'frontend:privacy_policy' %}">Privacy Policy</a>
+            <a href="{% url 'frontend:terms_of_service' %}">Terms of Service</a>
+            <a href="{% url 'frontend:disclaimer' %}">Disclaimer</a>
+            <a href="/">Home</a>
+        </div>
+        <p class="mt-3 mb-0" style="color: var(--muted); font-size: 0.85rem;">
+            © 2024 SecureHospital AI Demo
+        </p>
+    </div>
+</footer>
+
+</body>
+</html>
